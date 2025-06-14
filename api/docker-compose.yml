@@ -1,0 +1,17 @@
+services:
+  postgres:
+    image: postgres:latest
+    restart: always
+    ports:
+      - "5428:5432"
+    env_file:
+      - .docker.env
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - cinema
+
+volumes:
+  postgres_data:
+networks:
+  cinema:
