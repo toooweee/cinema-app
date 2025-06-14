@@ -1,8 +1,8 @@
-import { Injectable } from '@nestjs/common';
+import { ForbiddenException, Injectable } from '@nestjs/common';
 import { PrismaService } from '@prisma/prisma.service';
 import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
-import { JwtPayload } from '@tokens/types';
+import { JwtPayload, JwtVerifyPayload } from '@tokens/types';
 
 @Injectable()
 export class TokensService {
@@ -54,11 +54,33 @@ export class TokensService {
     });
   }
 
+  async refreshTokens(token: string) {
+    await this.findRefreshToken(token);
+
+    const payload = await this.validateRefreshToken(token);
+
+    if (!payload) {
+      throw new ForbiddenException();
+    }
+
+    const tokens = await this.generateTokens({ ...payload });
+
+    await this.saveRefreshToken(tokens.refreshToken, payload.sub);
+
+    return tokens;
+  }
+
   async findRefreshToken(token: string) {
     return this.prisma.token.findUniqueOrThrow({
       where: {
         token,
       },
+    });
+  }
+
+  private async validateRefreshToken(token: string): Promise<JwtVerifyPayload> {
+    return await this.jwtService.verifyAsync<JwtVerifyPayload>(token, {
+      secret: this.configService.get<string>('JWT_RT_SECRET'),
     });
   }
 }
