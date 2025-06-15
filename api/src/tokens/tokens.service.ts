@@ -63,7 +63,9 @@ export class TokensService {
       throw new ForbiddenException();
     }
 
-    const tokens = await this.generateTokens({ ...payload });
+    const { sub, email, role } = payload;
+
+    const tokens = await this.generateTokens({ sub, email, role });
 
     await this.saveRefreshToken(tokens.refreshToken, payload.sub);
 
