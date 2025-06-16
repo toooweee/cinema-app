@@ -21,8 +21,16 @@ export class UsersService {
   }
 
   async findOne(where: UserUniqueInput) {
-    return this.prisma.user.findUniqueOrThrow({
+    return this.prisma.user.findUnique({
       where,
+    });
+  }
+
+  async me(token: string) {
+    return this.prisma.user.findFirst({
+      where: {
+        token,
+      },
     });
   }
 }

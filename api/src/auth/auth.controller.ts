@@ -48,6 +48,19 @@ export class AuthController {
     return tokens;
   }
 
+  @Get('logout')
+  async logout(
+    @Res({ passthrough: true }) res: Response,
+    @Cookies('REFRESH_TOKEN') token: string,
+  ) {
+    res.cookie('REFRESH_TOKEN', '', {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      expires: new Date(),
+    });
+    return await this.authService.logout(token);
+  }
+
   private setTokenToCookies(token: string, res: Response) {
     res.cookie('REFRESH_TOKEN', token, {
       httpOnly: true,

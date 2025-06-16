@@ -7,6 +7,7 @@ import { PrismaModule } from '@prisma/prisma.module';
 import * as Joi from 'joi';
 import { APP_PIPE } from '@nestjs/core';
 import { ZodValidationPipe } from 'nestjs-zod';
+import { JwtStrategy } from '@auth/strategy/jwt.strategy';
 
 @Module({
   imports: [
@@ -27,6 +28,7 @@ import { ZodValidationPipe } from 'nestjs-zod';
       provide: APP_PIPE,
       useClass: ZodValidationPipe,
     },
+    JwtStrategy,
   ],
 })
 export class AppModule {}
